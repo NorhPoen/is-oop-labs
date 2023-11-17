@@ -8,16 +8,13 @@ public class TelegramMessageAdapter : IMessenger
 
     public TelegramMessageAdapter(TelegramMessenger telegramMessenger)
     {
+        ArgumentNullException.ThrowIfNull(telegramMessenger);
         _telegramMessenger = telegramMessenger;
     }
 
     public void ReceiveMessage(Message message)
     {
-        if (message is null)
-        {
-            throw new ArgumentException("Message can't be null");
-        }
-
+        ArgumentNullException.ThrowIfNull(message);
         _telegramMessenger.Print(message.Title + message.Body);
     }
 }

@@ -8,16 +8,13 @@ public class RecipientMessenger : IRecipient
 
     public RecipientMessenger(IMessenger messenger)
     {
+        ArgumentNullException.ThrowIfNull(messenger);
         _messenger = messenger;
     }
 
     public void ReceiveMessage(Message message)
     {
-        if (message is null)
-        {
-            throw new ArgumentException("message can't be null");
-        }
-
+        ArgumentNullException.ThrowIfNull(message);
         _messenger.ReceiveMessage(message);
     }
 }

@@ -7,6 +7,7 @@ public class User
 {
     public User(IList<UserMessage> messages)
     {
+        ArgumentNullException.ThrowIfNull(messages);
         Messages = messages;
     }
 
@@ -14,11 +15,13 @@ public class User
 
     public void ReceiveMessage(UserMessage message)
     {
+        ArgumentNullException.ThrowIfNull(message);
         Messages.Add(message);
     }
 
     public void MarkAsRead(UserMessage message)
     {
+        ArgumentNullException.ThrowIfNull(message);
         int ind = Messages.IndexOf(message);
         if (Messages[ind].IsRead)
         {

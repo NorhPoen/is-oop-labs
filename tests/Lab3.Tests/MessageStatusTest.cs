@@ -9,18 +9,32 @@ namespace Itmo.ObjectOrientedProgramming.Lab3.Tests;
 
 public class MessageStatusTest
 {
+    private readonly Message _message1;
+    private readonly Message _message2;
+    private readonly Message _message3;
+    private readonly UserMessage _userMessage1;
+    private readonly UserMessage _userMessage2;
+    private readonly UserMessage _userMessage3;
+
+    public MessageStatusTest()
+    {
+        _message1 = new Message("Test Title1", "Test Body1", 238);
+        _message2 = new Message("Test Title2", "Test Body2", 239);
+        _message3 = new Message("Test Title3", "Test Body3", 240);
+
+        _userMessage1 = new UserMessage(_message1);
+        _userMessage2 = new UserMessage(_message2);
+        _userMessage3 = new UserMessage(_message3);
+    }
+
     [Fact]
     public void NewMessageIsUnread()
     {
         var user = new RecipientUser(new User(new List<UserMessage>()));
 
-        var message1 = new Message("Test Title1", "Test Body1", 238);
-        var message2 = new Message("Test Title2", "Test Body2", 239);
-        var message3 = new Message("Test Title3", "Test Body3", 240);
-
-        user.ReceiveMessage(message1);
-        user.ReceiveMessage(message2);
-        user.ReceiveMessage(message3);
+        user.ReceiveMessage(_message1);
+        user.ReceiveMessage(_message2);
+        user.ReceiveMessage(_message3);
 
         Func<UserMessage, bool> predicate = msgUser => msgUser.IsRead;
 
@@ -34,17 +48,9 @@ public class MessageStatusTest
     {
         var user = new RecipientUser(new User(new List<UserMessage>()));
 
-        var message1 = new Message("Test Title1", "Test Body1", 238);
-        var message2 = new Message("Test Title2", "Test Body2", 239);
-        var message3 = new Message("Test Title3", "Test Body3", 240);
-
-        var userMessage1 = new UserMessage(message1);
-        var userMessage2 = new UserMessage(message2);
-        var userMessage3 = new UserMessage(message3);
-
-        user.User.ReceiveMessage(userMessage1);
-        user.User.ReceiveMessage(userMessage2);
-        user.User.ReceiveMessage(userMessage3);
+        user.User.ReceiveMessage(_userMessage1);
+        user.User.ReceiveMessage(_userMessage2);
+        user.User.ReceiveMessage(_userMessage3);
 
         Func<UserMessage, bool> predicate = msgUser => msgUser.IsRead;
 
@@ -52,9 +58,9 @@ public class MessageStatusTest
 
         Assert.False(allMsgsUnread);
 
-        user.User.MarkAsRead(userMessage1);
-        user.User.MarkAsRead(userMessage2);
-        user.User.MarkAsRead(userMessage3);
+        user.User.MarkAsRead(_userMessage1);
+        user.User.MarkAsRead(_userMessage2);
+        user.User.MarkAsRead(_userMessage3);
 
         bool allMsgsRead = user.User.Messages.All(predicate);
 
@@ -66,22 +72,16 @@ public class MessageStatusTest
     {
         var user = new RecipientUser(new User(new List<UserMessage>()));
 
-        var message1 = new Message("Test Title1", "Test Body1", 238);
-        var message2 = new Message("Test Title2", "Test Body2", 239);
+        user.User.ReceiveMessage(_userMessage1);
+        user.User.ReceiveMessage(_userMessage2);
 
-        var userMessage1 = new UserMessage(message1);
-        var userMessage2 = new UserMessage(message2);
-
-        user.User.ReceiveMessage(userMessage1);
-        user.User.ReceiveMessage(userMessage2);
-
-        user.User.MarkAsRead(userMessage2);
+        user.User.MarkAsRead(_userMessage2);
 
         bool testFailed = false;
 
         try
         {
-            user.User.MarkAsRead(userMessage2);
+            user.User.MarkAsRead(_userMessage2);
         }
         catch (ArgumentException)
         {

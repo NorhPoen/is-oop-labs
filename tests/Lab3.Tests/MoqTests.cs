@@ -2,6 +2,7 @@
 using Itmo.ObjectOrientedProgramming.Lab3.Entities.LogSystem;
 using Itmo.ObjectOrientedProgramming.Lab3.Entities.MessageFilter;
 using Itmo.ObjectOrientedProgramming.Lab3.Entities.Messenger;
+using Itmo.ObjectOrientedProgramming.Lab3.Models;
 using Moq;
 using Xunit;
 
@@ -9,19 +10,26 @@ namespace Itmo.ObjectOrientedProgramming.Lab3.Tests;
 
 public class MoqTests
 {
+    private readonly Message _message;
+    private readonly Mock<IRecipient> _recipientMock;
+    private readonly int _importance = 200;
+    private readonly RecipientWithProxy _proxyRecipient;
+    public MoqTests()
+    {
+        _message = new Message("Test Title", "Test Body");
+        _recipientMock = new Mock<IRecipient>();
+        Mock<ImportanceLevelFilter> filterMock = new(_importance);
+        _proxyRecipient = new RecipientWithProxy(_recipientMock.Object, filterMock.Object);
+    }
+
     [Fact]
     public void SendMessageShouldBeReceivedWhenPriorityIsHigh()
     {
         var importantMessage = new Message("Test Title", "Test Body", 250);
 
-        const int importance = 200;
-        var recipientMock = new Mock<IRecipient>();
+        _proxyRecipient.ReceiveMessage(importantMessage);
 
-        var proxyRecipientMock = new RecipientWithProxy(recipientMock.Object, importance);
-
-        proxyRecipientMock.ReceiveMessage(importantMessage);
-
-        recipientMock.Verify(recipient => recipient.ReceiveMessage(importantMessage), Times.Once);
+        _recipientMock.Verify(recipient => recipient.ReceiveMessage(importantMessage), Times.Once);
     }
 
     [Fact]
@@ -29,44 +37,33 @@ public class MoqTests
     {
         var notImportantMessage = new Message("Test Title", "Test Body", 150);
 
-        const int importance = 200;
-        var recipientMock = new Mock<IRecipient>();
+        _proxyRecipient.ReceiveMessage(notImportantMessage);
 
-        var proxyRecipientMock = new RecipientWithProxy(recipientMock.Object, importance);
-
-        proxyRecipientMock.ReceiveMessage(notImportantMessage);
-
-        recipientMock.Verify(recipient => recipient.ReceiveMessage(notImportantMessage), Times.Never);
+        _recipientMock.Verify(recipient => recipient.ReceiveMessage(notImportantMessage), Times.Never);
     }
 
     [Fact]
     public void SendingMessageWithLogIsSuccess()
     {
-        var message = new Message("Test Title", "Test Body");
+        var loggerMock = new Mock<IConsoleLogger>();
 
-        var loggerMock = new Mock<ILogger>();
-        var recipientMock = new Mock<IRecipient>();
+        var loggerRecipient = new ConsoleLoggerServiceDecorator(_recipientMock.Object, loggerMock.Object);
 
-        var loggerRecipient = new LoggerServiceDecorator(recipientMock.Object, loggerMock.Object);
+        loggerRecipient.ReceiveMessage(_message);
 
-        loggerRecipient.ReceiveMessage(message);
-
-        recipientMock.Verify(recipient => recipient.ReceiveMessage(message), Times.Once);
-
-        loggerMock.Verify(logger => logger.DisplayLogMessage(message.Title + " is received"), Times.Once);
+        _recipientMock.Verify(recipient => recipient.ReceiveMessage(_message), Times.Once);
+        loggerMock.Verify(logger => logger.DisplayLogMessage(_message.Title + " is received"), Times.Once);
     }
 
     [Fact]
     public void SendingMessageToMessengerIsSuccess()
     {
-        var message = new Message("Test Title", "Test Body");
-
         var messengerMock = new Mock<IMessenger>();
 
         var messenger = new RecipientMessenger(messengerMock.Object);
 
-        messenger.ReceiveMessage(message);
+        messenger.ReceiveMessage(_message);
 
-        messengerMock.Verify(recipient => recipient.ReceiveMessage(message), Times.Once);
+        messengerMock.Verify(recipient => recipient.ReceiveMessage(_message), Times.Once);
     }
 }

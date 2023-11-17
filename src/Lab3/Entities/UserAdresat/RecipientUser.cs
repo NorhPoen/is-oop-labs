@@ -1,9 +1,12 @@
+using System;
+
 namespace Itmo.ObjectOrientedProgramming.Lab3.Entities.UserAdresat;
 
 public class RecipientUser : IRecipient
 {
     public RecipientUser(User user)
     {
+        ArgumentNullException.ThrowIfNull(user);
         User = user;
     }
 
@@ -11,6 +14,7 @@ public class RecipientUser : IRecipient
 
     public void ReceiveMessage(Message message)
     {
+        ArgumentNullException.ThrowIfNull(message);
         User.ReceiveMessage(new UserMessage(message));
     }
 }

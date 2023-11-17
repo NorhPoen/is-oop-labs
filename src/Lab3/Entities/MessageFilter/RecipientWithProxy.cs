@@ -1,26 +1,25 @@
 using System;
+using Itmo.ObjectOrientedProgramming.Lab3.Models;
 
 namespace Itmo.ObjectOrientedProgramming.Lab3.Entities.MessageFilter;
 
 public class RecipientWithProxy : IRecipient
 {
-    private IRecipient _recipient;
-    private int _minImportanceLvl;
+    private readonly IRecipient _recipient;
+    private readonly IFilter _filter;
 
-    public RecipientWithProxy(IRecipient recipient, int minImportanceLvl)
+    public RecipientWithProxy(IRecipient recipient, IFilter filter)
     {
+        ArgumentNullException.ThrowIfNull(recipient);
+        ArgumentNullException.ThrowIfNull(filter);
         _recipient = recipient;
-        _minImportanceLvl = minImportanceLvl;
+        _filter = filter;
     }
 
     public void ReceiveMessage(Message message)
     {
-        if (message is null)
-        {
-            throw new ArgumentException("Message can't be null");
-        }
-
-        if (message.ImportanceLvl >= _minImportanceLvl)
+        ArgumentNullException.ThrowIfNull(message);
+        if (_filter.FilterMessage(message))
         {
             _recipient.ReceiveMessage(message);
         }

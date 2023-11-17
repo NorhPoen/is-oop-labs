@@ -11,15 +11,9 @@ public class Display : IDisplay
         _displayDriver = displayDriver;
     }
 
-    public void Print(string text, ConsoleColor color)
+    public void Print(string text)
     {
-        _displayDriver.ConsoleClean();
-        _displayDriver.ConsoleSetColor(color);
-        _displayDriver.ConsoleSetText(text);
-    }
-
-    public void PrintFile(string filePath, string text, ConsoleColor color)
-    {
-       _displayDriver.FileSetText(filePath, text, color);
+        ArgumentNullException.ThrowIfNull(text);
+        _displayDriver.SetText(text);
     }
 }

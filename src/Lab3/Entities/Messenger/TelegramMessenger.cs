@@ -8,11 +8,13 @@ public class TelegramMessenger : ITelegramMessenger
 
     public TelegramMessenger(string message)
     {
+        ArgumentNullException.ThrowIfNull(message);
         _message = message;
     }
 
     public void Print(string message)
     {
+        ArgumentNullException.ThrowIfNull(message);
         Console.WriteLine("Telegram message: " + message);
     }
 }
